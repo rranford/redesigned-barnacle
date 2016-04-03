@@ -23,27 +23,27 @@
                 fill: none;
             }
 
-            .axis path,
-            .axis line {
-                fill: none;
-                stroke: grey;
-                stroke-width: 1;
-                shape-rendering: crispEdges;
-            }
-
-            .grid .tick {
-                stroke: lightgrey;
-                stroke-opacity: 0.7;
-                shape-rendering: crispEdges;
-            }
-            
-            .grid text {
+            .axis text {
+                font: 10px sans-serif;
                 stroke: darkgrey;
                 shape-rendering: crispEdges;
             }
 
-            .grid path {
-                stroke-width: 0;
+            .axis path {
+                fill: none;
+                stroke: #000;
+                stroke-width: 0.6px;
+                shape-rendering: crispEdges;
+            }
+            .axis line {
+                fill: none;
+                stroke: lightgrey;
+                stroke-width: 0.8px;
+            }
+
+            .axis .major {
+                stroke: darkgrey;
+                stroke-width: 0.4px;
             }
 
             .area {
@@ -79,14 +79,17 @@
                 return d3.svg.axis()
                         .scale(x)
                         .orient("bottom")
-                        .ticks(d3.time.weeks, 1)
-                        .tickFormat(d3.time.format("%Y %b %d"));
+                        .ticks(d3.time.hours, 24)
+                        .tickFormat(d3.time.format("%Y %b %d"))
+                        .tickSize(-height, -height, -height);
             }
 
             function make_y_axis() {
                 return d3.svg.axis()
                         .scale(y)
-                        .orient("left");
+                        .orient("left")
+                        .ticks(50)
+                        .tickSize(-width, -width, -width);
             }
 
             var area = d3.svg.area()
@@ -152,11 +155,9 @@
                             .attr("d", valueline(data));
                                                 
                     svg.append("g")
-                            .attr("class", "grid")
+                            .attr("class", "x axis")
                             .attr("transform", "translate(0," + height + ")")
-                            .call(make_x_axis()
-                                    .tickSize(-height, 0, 0)
-                                    )
+                            .call(make_x_axis())
                             .selectAll("text")
                             .style("text-anchor", "end")
                             .attr("dx", "-.8em")
@@ -164,11 +165,8 @@
                             .attr("transform", "rotate(-65)");
 
                     svg.append("g")
-                            .attr("class", "grid")
-                            .call(make_y_axis()
-                                    .ticks(50)
-                                    .tickSize(-width, 0, 0)
-                                    );
+                            .attr("class", "y axis")
+                            .call(make_y_axis());
                             
                     svg.append("text")
                             .attr("transform",
