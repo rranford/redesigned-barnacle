@@ -106,34 +106,29 @@
                         return y(d.Magnitude);
                     });
 
-            var select = d3.select("#interpolate")
+            var selectiondropdown = d3.select("#interpolate")
                     .on("change", function () {
                         valueline.interpolate(this.value);
                         area.interpolate(this.value);
                         render();
                     });
-                    
-                    
-                var svg = d3.select("body")
-                    .append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-            
 
+            var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
             function render() {
-                
-                valueline.interpolate(select.property("value"));
-                area.interpolate(select.property("value"));
-                
-            
+
+                valueline.interpolate(selectiondropdown.property("value"));
+                area.interpolate(selectiondropdown.property("value"));
+
                 svg.selectAll("path").remove();
-                
-            
+
                 d3.csv("data/IEBQuakesExport.csv", function (error, data) {
                     data.forEach(function (d) {
                         d.datetime = parseDate(d.Day + " " + d.Time);
@@ -207,7 +202,7 @@
                             .text("Earthquake Magnitude by Date");
                 });
             }
-            
+
             render();
 
         </script>
