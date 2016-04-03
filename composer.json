@@ -1,0 +1,5 @@
+{
+    "require": {
+        "mbostock/d3": "^3.5"
+    }
+}
