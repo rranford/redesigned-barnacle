@@ -93,7 +93,7 @@
                     .x(function (d) {
                         return x(d.datetime);
                     })
-                    .y0(height)
+                    .y0(0)
                     .y1(function (d) {
                         return y(d.Magnitude);
                     });
@@ -149,13 +149,11 @@
 
                     svg.append("path")
                             .attr("class", "line")
-                            .style("stroke-dasharray", ("5, 5, 5, 5, 5, 5, 10, 5, 10, 5, 10, 5"))
                             .attr("d", valueline(data));
                                                 
                     svg.append("g")
                             .attr("class", "x axis")
                             .attr("transform", "translate(0," + height + ")")
-                            .style("stroke-dasharray", ("3, 3"))
                             .call(make_x_axis())
                             .selectAll("text")
                                 .style("text-anchor", "end")
@@ -165,7 +163,6 @@
 
                     svg.append("g")
                             .attr("class", "y axis")
-                            .style("stroke-dasharray", ("3, 3"))
                             .call(make_y_axis());
                             
                     svg.append("text")
