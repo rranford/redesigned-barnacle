@@ -149,6 +149,7 @@
 
                     svg.append("path")
                             .attr("class", "line")
+                            .style("stroke-dasharray", ("3, 3"))
                             .attr("d", valueline(data));
                                                 
                     svg.append("g")
