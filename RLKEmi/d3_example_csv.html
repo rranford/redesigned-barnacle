@@ -1,173 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <meta charset="utf-8" />
-    <style>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta charset="utf-8" />
+        <style>
 
-    body { 
-        font-size: 12px;
-        font-family: monospace;
-        font-wieght: bold;
-    }
+            body { 
+                font-size: 12px;
+                font-family: monospace;
+                font-wieght: bold;
+            }
 
-    text.shadow {
-        stroke: #fff;
-        stroke-width: 2.5px;
-        opacity: 0.9;
-    }
+            text.shadow {
+                stroke: #fff;
+                stroke-width: 2.5px;
+                opacity: 0.9;
+            }
 
-    path { 
-        stroke: steelblue;
-        stroke-width: 1;
-        fill: none;
-    }
+            path { 
+                stroke: steelblue;
+                stroke-width: 1;
+                fill: none;
+            }
 
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: grey;
-        stroke-width: 1;
-        shape-rendering: crispEdges;
-    }
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: grey;
+                stroke-width: 1;
+                shape-rendering: crispEdges;
+            }
 
-    .grid .tick {
-        stroke: lightgrey;
-        stroke-opacity: 0.7;
-        shape-rendering: crispEdges;
-    }
-    .grid path {
-        stroke-width: 0;
-    }
+            .grid .tick {
+                stroke: lightgrey;
+                stroke-opacity: 0.7;
+                shape-rendering: crispEdges;
+            }
 
-    .area {
-        fill: lightsteelblue;
-        stroke-width: 0;
-    }
-    </style>
-</head>
-<body>
+            .grid path {
+                stroke-width: 0;
+            }
 
-<script type="text/javascript" src="d3/d3.v3.js"></script>
+            .area {
+                fill: lightsteelblue;
+                stroke-width: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <select id="interpolate">
+            <option>basis-closed</option>
+            <option>linear</option>
+            <option>basis</option>
+            <option>cardinal-closed</option>
+            <option>cardinal</option>
+            <option>monotone</option>
+            <option>step</option>
+            <option>step-before</option>
+            <option>step-after</option>
+        </select>
+        <script type="text/javascript" src="d3/d3.v3.js"></script>
 
-<script>
+        <script>
 
-var margin = {top: 20, right: 30, bottom: 100, left: 50},
-    width = 3000 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+            var margin = {top: 20, right: 30, bottom: 100, left: 50},
+            width = 3000 - margin.left - margin.right,
+                    height = 550 - margin.top - margin.bottom;
 
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
+            var x = d3.time.scale().range([0, width]);
+            var y = d3.scale.linear().range([height, 0]);
 
-var xAxis = d3.svg.axis();
+            var xAxis = d3.svg.axis();
 
-function make_x_axis() {
-    return d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(d3.time.weeks, 1)
-        .tickFormat(d3.time.format("%Y %b %d"))
-}
+            function make_x_axis() {
+                return d3.svg.axis()
+                        .scale(x)
+                        .orient("bottom")
+                        .ticks(d3.time.weeks, 1)
+                        .tickFormat(d3.time.format("%Y %b %d"));
+            }
 
-var yAxis = d3.svg.axis();
+            var yAxis = d3.svg.axis();
 
-function make_y_axis() {
-  return d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(5)
-}
+            function make_y_axis() {
+                return d3.svg.axis()
+                        .scale(y)
+                        .orient("left")
+                        .ticks(5);
+            }
 
-var area = d3.svg.area()
-    .interpolate("basis")	
-    .x(function(d) { return x(d.datetime); })
-    .y0(height)
-    .y1(function(d) { return y(d.Magnitude); });
+            var area = d3.svg.area()
+                    .x(function (d) {
+                        return x(d.datetime);
+                    })
+                    .y0(height)
+                    .y1(function (d) {
+                        return y(d.Magnitude);
+                    });
 
-var valueline = d3.svg.line()
-    .interpolate("basis")	
-    .x(function(d) { return x(d.datetime); })
-    .y(function(d) { return y(d.Magnitude); });
-    
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var valueline = d3.svg.line()
+                    .x(function (d) {
+                        return x(d.datetime);
+                    })
+                    .y(function (d) {
+                        return y(d.Magnitude);
+                    });
 
-var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
-
-d3.csv("data/IEBQuakesExport.csv", function(error, data) {
-    data.forEach(function(d) {
-        d.datetime = parseDate(d.Day + " " + d.Time);
-        d.Magnitude = +d.Magnitude;
-    });
-
-    x.domain(d3.extent(data, function(d) { return d.datetime; }));
-    y.domain([0, d3.max(data, function(d) { return d.Magnitude; })]);
-
-    svg.append("path")
-        .datum(data)
-        .attr("class", "area")
-        .attr("d", area);
-
-    svg.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(data));
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(make_x_axis()
-            .tickSize(-height, 0, 0)
-        )
-        .selectAll("text")  
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-65)" );
-    
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(make_y_axis()
-            .tickSize(-width, 0, 0)
-        );
-
-    svg.append("text")
-        .attr("transform",
-              "translate(" + (width/2) + " ," + 
-                             (height+margin.bottom) + ")")
-        .style("text-anchor", "middle")
-        .text("Date");
-
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 8)
-        .attr("x", margin.top - (height / 2))
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .attr("class", "shadow")
-        .text("Magnitude");
-
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 8)
-        .attr("x", margin.top - (height / 2))
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Magnitude");
-
-    svg.append("text")
-        .attr("x", (width / 2))     
-        .attr("y", 0 - (margin.top / 2))
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("text-decoration", "underline")
-        .text("Earthquake Magnitude by Date");
+            var select = d3.select("#interpolate")
+                    .on("change", function () {
+                        valueline.interpolate(this.value);
+                        area.interpolate(this.value);
+                        render();
+                    });
+                    
+                    
+                var svg = d3.select("body")
+                    .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            
 
 
-});
+            var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
-</script>
-</body>
+            function render() {
+                
+                valueline.interpolate(select.property("value"));
+                area.interpolate(select.property("value"));
+                
+            
+                svg.selectAll("path").remove();
+                
+            
+                d3.csv("data/IEBQuakesExport.csv", function (error, data) {
+                    data.forEach(function (d) {
+                        d.datetime = parseDate(d.Day + " " + d.Time);
+                        d.Magnitude = +d.Magnitude;
+                    });
+
+                    x.domain(d3.extent(data, function (d) {
+                        return d.datetime;
+                    }));
+                    y.domain([0, d3.max(data, function (d) {
+                            return d.Magnitude;
+                        })]);
+
+                    svg.append("path")
+                            .datum(data)
+                            .attr("class", "area")
+                            .attr("d", area);
+
+                    svg.append("path")
+                            .attr("class", "line")
+                            .attr("d", valueline(data));
+
+                    svg.append("g")
+                            .attr("class", "x axis")
+                            .attr("transform", "translate(0," + height + ")")
+                            .call(make_x_axis()
+                                    .tickSize(-height, 0, 0)
+                                    )
+                            .selectAll("text")
+                            .style("text-anchor", "end")
+                            .attr("dx", "-.8em")
+                            .attr("dy", ".15em")
+                            .attr("transform", "rotate(-65)");
+
+                    svg.append("g")
+                            .attr("class", "y axis")
+                            .call(make_y_axis()
+                                    .tickSize(-width, 0, 0)
+                                    );
+
+                    svg.append("text")
+                            .attr("transform",
+                                    "translate(" + (width / 2) + " ," +
+                                    (height + margin.bottom) + ")")
+                            .style("text-anchor", "middle")
+                            .text("Date");
+
+                    svg.append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 8)
+                            .attr("x", margin.top - (height / 2))
+                            .attr("dy", ".71em")
+                            .style("text-anchor", "end")
+                            .attr("class", "shadow")
+                            .text("Magnitude");
+
+                    svg.append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 8)
+                            .attr("x", margin.top - (height / 2))
+                            .attr("dy", ".71em")
+                            .style("text-anchor", "end")
+                            .text("Magnitude");
+
+                    svg.append("text")
+                            .attr("x", (width / 2))
+                            .attr("y", 0 - (margin.top / 2))
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "16px")
+                            .style("text-decoration", "underline")
+                            .text("Earthquake Magnitude by Date");
+                });
+            }
+            
+            render();
+
+        </script>
+    </body>
