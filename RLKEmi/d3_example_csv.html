@@ -25,25 +25,22 @@
 
             .axis text {
                 font: 10px sans-serif;
-                stroke: darkgrey;
+                stroke-width: 0px;
                 shape-rendering: crispEdges;
             }
 
             .axis path {
                 fill: none;
-                stroke: #000;
-                stroke-width: 0.6px;
+                stroke: none;
+                stroke-width: 0px;
                 shape-rendering: crispEdges;
             }
-            .axis line {
-                fill: none;
+  
+            .axis .tick {
                 stroke: lightgrey;
                 stroke-width: 0.8px;
-            }
-
-            .axis .major {
-                stroke: darkgrey;
-                stroke-width: 0.4px;
+                stroke-opacity: 0.7;
+                shape-rendering: crispEdges;
             }
 
             .area {
@@ -81,15 +78,15 @@
                         .orient("bottom")
                         .ticks(d3.time.hours, 24)
                         .tickFormat(d3.time.format("%Y %b %d"))
-                        .tickSize(-height, -height, -height);
+                        .tickSize(-height, 0, 0);
             }
 
             function make_y_axis() {
                 return d3.svg.axis()
                         .scale(y)
                         .orient("left")
-                        .ticks(50)
-                        .tickSize(-width, -width, -width);
+                        .ticks(35)
+                        .tickSize(-width, 0, 0);
             }
 
             var area = d3.svg.area()
@@ -159,10 +156,10 @@
                             .attr("transform", "translate(0," + height + ")")
                             .call(make_x_axis())
                             .selectAll("text")
-                            .style("text-anchor", "end")
-                            .attr("dx", "-.8em")
-                            .attr("dy", ".15em")
-                            .attr("transform", "rotate(-65)");
+                                .style("text-anchor", "end")
+                                .attr("dx", "-.8em")
+                                .attr("dy", ".15em")
+                                .attr("transform", "rotate(-65)");
 
                     svg.append("g")
                             .attr("class", "y axis")
