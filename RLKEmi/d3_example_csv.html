@@ -44,7 +44,7 @@
             }
 
             .area {
-                fill: lightsteelblue;
+                fill: none;
                 stroke-width: 0;
             }
         </style>
@@ -66,7 +66,7 @@
         <script>
 
             var margin = {top: 20, right: 30, bottom: 100, left: 50},
-            width = 3000 - margin.left - margin.right,
+            width = 6000 - margin.left - margin.right,
                     height = 550 - margin.top - margin.bottom;
 
             var x = d3.time.scale().range([0, width]);
@@ -95,7 +95,7 @@
                     })
                     .y0(height)
                     .y1(function (d) {
-                        return y(d.Magnitude);
+                        return y(d.Depth);
                     });
 
             var valueline = d3.svg.line()
@@ -103,8 +103,10 @@
                         return x(d.datetime);
                     })
                     .y(function (d) {
-                        return y(d.Magnitude);
+                        return y(d.Depth);
                     });
+                    
+            var magnutudeCircle = d3.svg.
 
             var selectiondropdown = d3.select("#interpolate")
                     .on("change", function () {
@@ -132,14 +134,14 @@
                 d3.csv("data/IEBQuakesExport.csv", function (error, data) {
                     data.forEach(function (d) {
                         d.datetime = parseDate(d.Day + " " + d.Time);
-                        d.Magnitude = +d.Magnitude;
+                        d.Depth = +d.Depth;
                     });
 
                     x.domain(d3.extent(data, function (d) {
                         return d.datetime;
                     }));
                     y.domain([0, d3.max(data, function (d) {
-                            return d.Magnitude;
+                            return d.Depth;
                         })]);
 
                     svg.append("path")
@@ -179,7 +181,7 @@
                             .attr("dy", ".71em")
                             .style("text-anchor", "end")
                             .attr("class", "shadow")
-                            .text("Magnitude");
+                            .text("Depth");
 
                     svg.append("text")
                             .attr("transform", "rotate(-90)")
@@ -187,7 +189,7 @@
                             .attr("x", margin.top - (height / 2))
                             .attr("dy", ".71em")
                             .style("text-anchor", "end")
-                            .text("Magnitude");
+                            .text("Depth");
 
                     svg.append("text")
                             .attr("x", (width / 2))
@@ -195,7 +197,7 @@
                             .attr("text-anchor", "middle")
                             .style("font-size", "16px")
                             .style("text-decoration", "underline")
-                            .text("Earthquake Magnitude by Date 2015");
+                            .text("Earthquake Magnitude and Depth by Date 2015");
                 });
             }
 
