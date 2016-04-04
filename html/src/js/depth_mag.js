@@ -1,76 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <meta charset="utf-8" />
-        <style>
-
-            body { 
-                font-size: 12px;
-                font-family: monospace;
-                font-wieght: bold;
-            }
-
-            text.shadow {
-                stroke: #fff;
-                stroke-width: 2.5px;
-                opacity: 0.9;
-            }
-
-            path { 
-                stroke: steelblue;
-                stroke-width: 1;
-                fill: none;
-            }
-
-            .axis text {
-                font: 10px sans-serif;
-                stroke-width: 0px;
-                shape-rendering: crispEdges;
-            }
-
-            .axis path {
-                fill: none;
-                stroke: none;
-                stroke-width: 0px;
-                shape-rendering: crispEdges;
-            }
-  
-            .axis .tick {
-                stroke: lightgrey;
-                stroke-width: 0.8px;
-                stroke-opacity: 0.7;
-                shape-rendering: crispEdges;
-            }
-
-            .area {
-                fill: none;
-                stroke-width: 0;
-            }
-        </style>
-    </head>
-    <body>
-        <select id="interpolate">
-            <option>basis-closed</option>
-            <option>linear</option>
-            <option>basis</option>
-            <option>cardinal-closed</option>
-            <option>cardinal</option>
-            <option>monotone</option>
-            <option>step</option>
-            <option>step-before</option>
-            <option>step-after</option>
-        </select>
-        <script type="text/javascript" src="d3/d3.v3.js"></script>
-
-        <script>
 
             var margin = {top: 20, right: 30, bottom: 100, left: 50},
-            width = 6000 - margin.left - margin.right,
-                    height = 550 - margin.top - margin.bottom;
+                width = 6000 - margin.left - margin.right,
+                height = 550 - margin.top - margin.bottom;
 
             var x = d3.time.scale().range([0, width]);
-            var y = d3.scale.linear().range([height, 0]);
+            var y = d3.scale.linear().range([0, height]);
 
             function make_x_axis() {
                 return d3.svg.axis()
@@ -112,15 +46,15 @@
                         area.interpolate(this.value);
                         render();
                     });
-
+            
+            var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+					
             var svg = d3.select("body")
                     .append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
             function render() {
 
@@ -129,7 +63,7 @@
 
                 svg.selectAll("path").remove();
 
-                d3.csv("data/IEBQuakesExport.csv", function (error, data) {
+                d3.csv("../src/data/IEBQuakesExport.csv", function (error, data) {
                     data.forEach(function (d) {
                         d.datetime = parseDate(d.Day + " " + d.Time);
                         d.Depth = +d.Depth;
@@ -150,6 +84,15 @@
                     svg.append("path")
                             .attr("class", "line")
                             .attr("d", valueline(data));
+                                                
+                                                
+					svg.selectAll("dot")
+							.data(data)
+						.enter().append("circle")
+							.attr("r", function(d) { return d.Magnitude; })
+							.attr("cx", function(d) { return x(d.datetime); })
+							.attr("cy", function(d) { return y(d.Depth); });
+                                                
                                                 
                     svg.append("g")
                             .attr("class", "x axis")
@@ -198,8 +141,3 @@
                             .text("Earthquake Magnitude and Depth by Date 2015");
                 });
             }
-
-            render();
-
-        </script>
-    </body>
