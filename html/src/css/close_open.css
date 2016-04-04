@@ -17,13 +17,13 @@ path {
     fill: none;
 }
 
-path line1 { 
+.lineopen { 
     stroke: darkblue;
     stroke-width: 1;
     fill: none;
 }
 
-path line2 { 
+.lineclose { 
     stroke: darkred;
     stroke-width: 1;
     fill: none;
